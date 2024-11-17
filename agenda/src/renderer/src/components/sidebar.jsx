@@ -3,6 +3,11 @@ import React from 'react';
 import CalendarSidebar from './calendarSidebar';
 
 function Sidebar({ isOpen, toggleSidebar, setView, setSelectedDate }) {
+  const handleDateSelection = (selectedDate) => {
+    setSelectedDate(selectedDate); // Actualiza la fecha
+    setView('workWeek'); // Cambia automáticamente a la vista de semana laboral
+  };
+
   return (
     <div>
       {!isOpen && (
@@ -24,11 +29,18 @@ function Sidebar({ isOpen, toggleSidebar, setView, setSelectedDate }) {
             <li className="py-2 hover:bg-gray-200 cursor-pointer" onClick={() => setView('day')}>
               Día
             </li>
+            <li
+              className="py-2 hover:bg-gray-200 cursor-pointer"
+              onClick={() => setView('workWeek')}
+            >
+              Semana laboral
+            </li>
             <li className="py-2 hover:bg-gray-200 cursor-pointer" onClick={() => setView('month')}>
               Mes
             </li>
           </ul>
-          <CalendarSidebar setSelectedDate={setSelectedDate} />
+          {/* CalendarSidebar actualizado */}
+          <CalendarSidebar setSelectedDate={handleDateSelection} />
         </div>
       </div>
     </div>
