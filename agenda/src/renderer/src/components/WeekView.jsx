@@ -3,13 +3,14 @@ import { startOfWeek, addDays, format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import EventForm from './EventForm';
 
-function WorkWeekView({ date, setDate }) {
+function WeekView({ date, setDate }) {
   const [showForm, setShowForm] = useState(false);
   const [selectedTime, setSelectedTime] = useState(null);
   const [events, setEvents] = useState([]);
 
-  const startDate = startOfWeek(date, { weekStartsOn: 1 }); // Comienza desde el lunes
-  const days = Array.from({ length: 5 }, (_, i) => addDays(startDate, i)); // De lunes a viernes
+  // Calcula el inicio de la semana completa (lunes) y agrega 7 días
+  const startDate = startOfWeek(date, { weekStartsOn: 1 });
+  const days = Array.from({ length: 7 }, (_, i) => addDays(startDate, i)); // De lunes a domingo
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
   const handleRowClick = (day, hour) => {
@@ -24,13 +25,12 @@ function WorkWeekView({ date, setDate }) {
 
   const handleAddEvent = (event) => {
     setEvents([...events, event]);
-    setShowForm(false);
-    setSelectedTime(null); // Limpia la selección
+    setShowForm(false); // Oculta el formulario después de guardar
   };
 
   const handleCloseForm = () => {
-    setShowForm(false);
-    setSelectedTime(null);
+    setShowForm(false); // Oculta el formulario al cancelar
+    setSelectedTime(null); // Limpia la hora seleccionada
   };
 
   return (
@@ -44,7 +44,7 @@ function WorkWeekView({ date, setDate }) {
         </button>
         <h2 className="text-xl font-bold">
           {format(days[0], 'dd')} de {format(days[0], 'MMMM yyyy', { locale: es })} -{' '}
-          {format(days[4], 'dd')} de {format(days[4], 'MMMM yyyy', { locale: es })}
+          {format(days[6], 'dd')} de {format(days[6], 'MMMM yyyy', { locale: es })}
         </h2>
         <button
           onClick={() => setDate(addDays(date, 7))}
@@ -54,7 +54,7 @@ function WorkWeekView({ date, setDate }) {
         </button>
       </div>
 
-      <div className="grid grid-cols-6 border border-gray-300 h-[calc(100vh-200px)] overflow-y-auto">
+      <div className="grid grid-cols-8 border border-gray-300 h-[calc(100vh-200px)] overflow-y-auto">
         {/* Columna "Horas" */}
         <div className="bg-gray-100 text-center sticky top-0 z-10">
           <div className="py-6 border-b text-sm text-black">Horas</div>
@@ -68,9 +68,10 @@ function WorkWeekView({ date, setDate }) {
           ))}
         </div>
 
-        {/* Días de la semana laboral */}
+        {/* Días de la semana completa */}
         {days.map((day, dayIndex) => (
           <div key={dayIndex} className="text-center">
+            {/* Encabezado de cada día */}
             <div className="bg-gray-100 text-black font-semibold py-2 sticky top-0 z-10 border-b">
               {format(day, 'EEEE', { locale: es })} <br />
               {format(day, 'dd')}
@@ -99,4 +100,4 @@ function WorkWeekView({ date, setDate }) {
   );
 }
 
-export default WorkWeekView;
+export default WeekView;

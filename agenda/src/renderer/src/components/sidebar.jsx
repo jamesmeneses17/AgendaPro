@@ -1,11 +1,24 @@
-// src/components/Sidebar.jsx
 import React from 'react';
 import CalendarSidebar from './calendarSidebar';
 
-function Sidebar({ isOpen, toggleSidebar, setView, setSelectedDate }) {
+function Sidebar({
+  isOpen,
+  toggleSidebar,
+  setView,
+  setSelectedDate,
+  workWeekRange,
+  fullWeekRange,
+  currentView,
+}) {
   const handleDateSelection = (selectedDate) => {
-    setSelectedDate(selectedDate); // Actualiza la fecha
-    setView('workWeek'); // Cambia automáticamente a la vista de semana laboral
+    setSelectedDate(selectedDate);
+
+    // Cambiar automáticamente a la vista correspondiente
+    if (currentView === 'workWeek') {
+      setView('workWeek');
+    } else if (currentView === 'week') {
+      setView('week');
+    }
   };
 
   return (
@@ -35,12 +48,22 @@ function Sidebar({ isOpen, toggleSidebar, setView, setSelectedDate }) {
             >
               Semana laboral
             </li>
+            <li
+              className="py-2 hover:bg-gray-200 cursor-pointer"
+              onClick={() => setView('week')}
+            >
+              Semana
+            </li>
             <li className="py-2 hover:bg-gray-200 cursor-pointer" onClick={() => setView('month')}>
               Mes
             </li>
           </ul>
-          {/* CalendarSidebar actualizado */}
-          <CalendarSidebar setSelectedDate={handleDateSelection} />
+          <CalendarSidebar
+            setSelectedDate={handleDateSelection}
+            workWeekRange={currentView === 'workWeek' ? workWeekRange : null}
+            fullWeekRange={currentView === 'week' ? fullWeekRange : null}
+            view={currentView}
+          />
         </div>
       </div>
     </div>

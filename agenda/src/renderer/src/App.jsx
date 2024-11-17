@@ -1,52 +1,53 @@
-// App.jsx
-import React, { useState } from 'react'
-import Header from './components/header'
-import Sidebar from './components/sidebar'
-import TaskList from './components/taskList'
-import TaskForm from './components/taskForm'
-import DayView from './components/dayView'
-import WorkWeekView from './components/workWeekView'
-import { format, addDays, subDays, startOfWeek } from 'date-fns'
+import React, { useState } from 'react';
+import Header from './components/header';
+import Sidebar from './components/sidebar';
+import DayDetailsSidebar from './components/DayDetailsSidebar'; // Importa la barra lateral
+import DayView from './components/dayView';
+import WorkWeekView from './components/workWeekView';
+import WeekView from './components/WeekView';
+import MonthView from './components/MonthView'; // Asegúrate de que el archivo MonthView exista
+import { startOfWeek, addDays } from 'date-fns';
 
 function App() {
-  const [tasks, setTasks] = useState([])
-  const [showForm, setShowForm] = useState(false)
-  const [selectedTask, setSelectedTask] = useState(null)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [view, setView] = useState('day')
-  const [date, setDate] = useState(new Date())
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [view, setView] = useState('day'); // Vista inicial
+  const [date, setDate] = useState(new Date());
+  const [workWeekRange, setWorkWeekRange] = useState(null); // Rango de semana laboral
+  const [fullWeekRange, setFullWeekRange] = useState(null); // Rango de semana completa
+  const [selectedDate, setSelectedDate] = useState(null); // Fecha seleccionada para la barra lateral
 
   const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen)
-  }
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
-  const addTask = (task) => {
-    setTasks([...tasks, task])
-    setShowForm(false)
-  }
+  const handleDateSelect = (selectedDate) => {
+    setSelectedDate(selectedDate);
+    setDate(selectedDate);
 
-  const editTask = (task) => {
-    setSelectedTask(task)
-    setShowForm(true)
-  }
+    if (view === 'workWeek') {
+      updateWorkWeekRange(selectedDate); // Actualiza el rango de la semana laboral
+    }
 
-  const deleteTask = (task) => {
-    setTasks(tasks.filter((t) => t !== task))
-  }
+    if (view === 'week') {
+      updateFullWeekRange(selectedDate); // Actualiza el rango de la semana completa
+    }
+  };
 
-  const goToPreviousDay = () => {
-    setDate(subDays(date, 1))
-  }
+  const closeDayDetails = () => {
+    setSelectedDate(null); // Cierra la barra lateral
+  };
 
-  const goToNextDay = () => {
-    setDate(addDays(date, 1))
-  }
+  const updateWorkWeekRange = (selectedDate) => {
+    const start = startOfWeek(selectedDate, { weekStartsOn: 1 });
+    const end = addDays(start, 4); // Lunes a viernes
+    setWorkWeekRange({ start, end });
+  };
 
-  const setSelectedDate = (selectedDate) => {
-    setDate(selectedDate)
-    // Cambiar automáticamente a la vista de la semana laboral
-    setView('workWeek')
-  }
+  const updateFullWeekRange = (selectedDate) => {
+    const start = startOfWeek(selectedDate, { weekStartsOn: 1 });
+    const end = addDays(start, 6); // Lunes a domingo
+    setFullWeekRange({ start, end });
+  };
 
   return (
     <div className="App bg-white h-screen flex flex-col overflow-hidden">
@@ -56,11 +57,16 @@ function App() {
           isOpen={isSidebarOpen}
           toggleSidebar={toggleSidebar}
           setView={setView}
-          setSelectedDate={setSelectedDate}
+          setSelectedDate={handleDateSelect}
+          workWeekRange={workWeekRange}
+          fullWeekRange={fullWeekRange}
+          currentView={view} // Pasar la vista actual
         />
 
         <main
-          className={`flex-1 p-4 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}
+          className={`flex-1 p-4 transition-all duration-300 ${
+            isSidebarOpen ? 'ml-64' : ''
+          } ${selectedDate ? 'mr-64' : ''}`} // Ajustar margen derecho si la barra lateral está activa
         >
           {/* Barra de navegación para cambiar la vista */}
           <div className="flex justify-between items-center mb-4">
@@ -72,13 +78,19 @@ function App() {
                 Día
               </button>
               <button
-                onClick={() => setView('workWeek')}
+                onClick={() => {
+                  setView('workWeek');
+                  updateWorkWeekRange(date); // Actualiza el rango al cambiar a semana laboral
+                }}
                 className={`${view === 'workWeek' ? 'font-semibold' : ''}`}
               >
                 Semana laboral
               </button>
               <button
-                onClick={() => setView('week')}
+                onClick={() => {
+                  setView('week');
+                  updateFullWeekRange(date); // Actualiza el rango al cambiar a semana completa
+                }}
                 className={`${view === 'week' ? 'font-semibold' : ''}`}
               >
                 Semana
@@ -91,29 +103,43 @@ function App() {
               </button>
             </div>
           </div>
+
           {/* Vista de día */}
           {view === 'day' && <DayView date={date} setDate={setDate} />}
 
           {/* Vista de semana laboral */}
-          {view === 'workWeek' && <WorkWeekView date={date} setDate={setDate} />}
-
-          {/* Vista de mes con lista de tareas */}
-          {view === 'month' && (
-            <div>
-              <TaskList tasks={tasks} onEdit={editTask} onDelete={deleteTask} />
-              {showForm && <TaskForm onSubmit={addTask} task={selectedTask} />}
-              <button
-                onClick={() => setShowForm(true)}
-                className="p-2 bg-blue-500 text-white rounded mt-4"
-              >
-                Agregar Tarea
-              </button>
-            </div>
+          {view === 'workWeek' && (
+            <WorkWeekView
+              date={date}
+              setDate={(selectedDate) => {
+                setDate(selectedDate);
+                updateWorkWeekRange(selectedDate);
+              }}
+            />
           )}
+
+          {/* Vista de semana completa */}
+          {view === 'week' && (
+            <WeekView
+              date={date}
+              setDate={(selectedDate) => {
+                setDate(selectedDate);
+                updateFullWeekRange(selectedDate);
+              }}
+            />
+          )}
+
+          {/* Vista del mes */}
+          {view === 'month' && <MonthView date={date} setDate={handleDateSelect} />}
         </main>
       </div>
+
+      {/* Barra lateral de detalles del día */}
+      {selectedDate && (
+        <DayDetailsSidebar selectedDate={selectedDate} onClose={closeDayDetails} />
+      )}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
