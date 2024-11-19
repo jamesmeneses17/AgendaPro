@@ -6,9 +6,10 @@ import WorkWeekView from './components/workWeekView';
 import WeekView from './components/WeekView';
 import MonthView from './components/MonthView';
 import Login from './components/Login';
-import WindowControls from './components/WindowControls';
-import Header from './components/header';
+import Header from './components/header'; // Header con minimizar, maximizar y cerrar
 import { startOfWeek, addDays } from 'date-fns';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -52,19 +53,37 @@ function App() {
     setFullWeekRange({ start, end });
   };
 
-  const handleLogin = (isLoggedIn) => {
-    setIsAuthenticated(isLoggedIn);
+  const handleLogin = (isSuccess, message) => {
+    if (isSuccess) {
+      toast.success(message, {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        onClose: () => setIsAuthenticated(true), // Autentica después de cerrar la notificación
+      });
+    } else {
+      toast.error(message, {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
   };
 
   return (
     <div className="App bg-white h-screen flex flex-col overflow-hidden">
-      {/* Controles de ventana siempre presentes */}
-      <WindowControls />
+      <ToastContainer />
+      <Header /> {/* Incluye el header con controles */}
       {!isAuthenticated ? (
         <Login onLogin={handleLogin} />
       ) : (
         <>
-          <Header />
           <div className="flex flex-1">
             <Sidebar
               isOpen={isSidebarOpen}
@@ -137,7 +156,9 @@ function App() {
                   }}
                 />
               )}
-              {view === 'month' && <MonthView date={date} setDate={handleDateSelect} />}
+              {view === 'month' && (
+                <MonthView date={date} setDate={handleDateSelect} />
+              )}
             </main>
           </div>
 

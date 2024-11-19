@@ -1,48 +1,50 @@
 import React, { useState } from 'react';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase/firebaseConfig";
 
 function Login({ onLogin }) {
-  const [isRegistering, setIsRegistering] = useState(false); // Alterna entre registro e inicio de sesión
+  const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState(''); // Campo para el nombre en el registro
+  const [name, setName] = useState('');
 
   const handleSwitchMode = () => {
-    setIsRegistering(!isRegistering); // Cambia entre iniciar sesión y registrarse
+    setIsRegistering(!isRegistering);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí puedes agregar lógica de autenticación o registro
-    onLogin(true); // Simula un inicio de sesión exitoso
+
+    if (isRegistering) {
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        onLogin(true, 'Cuenta creada exitosamente. Inicia sesion'); // Notificación de éxito
+        setEmail('');
+        setPassword('');
+        setName('');
+      } catch (error) {
+        onLogin(false, 'Error al crear la cuenta. Intenta de nuevo.'); // Notificación de error
+      }
+    } else {
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        onLogin(true, 'Inicio de sesión exitoso.'); // Notificación de éxito
+      } catch (error) {
+        onLogin(false, 'Error al iniciar sesión. .'); // Notificación de error
+      }
+    }
   };
 
   return (
     <div className="h-screen bg-gray-200 flex flex-col">
-      {/* Controles de ventana */}
-      <div className="absolute top-0 left-0 right-0 bg-blue-500 h-8 flex items-center justify-between px-4">
-        <div className="flex space-x-2">
-          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-          <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-        </div>
-        <div className="text-white text-sm font-bold">AgendaPro</div>
-      </div>
-
-      {/* Contenido principal */}
       <div className="flex flex-1 items-center justify-center mt-10">
         <div className="relative bg-white rounded-lg shadow-lg flex overflow-hidden w-3/4 max-w-4xl">
-          {/* Sección izquierda */}
           <div className="w-1/2 bg-blue-500 text-white flex flex-col justify-center items-center p-8">
             <h2 className="text-3xl font-bold mb-4">
               {isRegistering
                 ? 'Únete a nuestro Calendario'
                 : 'Bienvenido al Calendario'}
             </h2>
-            <p className="text-sm mb-8">
-              {isRegistering
-                ? 'Regístrate para organizar tus eventos y tareas fácilmente.'
-                : 'Administra tus tareas y eventos de manera eficiente.'}
-            </p>
             <button
               onClick={handleSwitchMode}
               className="bg-white text-blue-500 px-4 py-2 rounded-md shadow hover:bg-gray-100 transition"
@@ -51,7 +53,6 @@ function Login({ onLogin }) {
             </button>
           </div>
 
-          {/* Sección derecha */}
           <div className="w-1/2 p-8">
             <h2 className="text-2xl font-bold mb-6">
               {isRegistering ? 'Regístrate aquí' : 'Inicia sesión aquí'}
@@ -102,20 +103,6 @@ function Login({ onLogin }) {
                 {isRegistering ? 'Registrar' : 'Iniciar Sesión'}
               </button>
             </form>
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">O usa tu cuenta</p>
-              <div className="flex justify-center space-x-4 mt-2">
-                <button className="bg-gray-100 p-2 rounded-full hover:bg-gray-200 transition">
-                  F
-                </button>
-                <button className="bg-gray-100 p-2 rounded-full hover:bg-gray-200 transition">
-                  G
-                </button>
-                <button className="bg-gray-100 p-2 rounded-full hover:bg-gray-200 transition">
-                  T
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
