@@ -76,97 +76,134 @@ function App() {
     }
   };
 
+  const handleLogout = () => {
+    toast.success(
+      <div className="flex items-center">
+        <span className="text-green-500 text-xl mr-2"></span>
+        <span>Sesión cerrada correctamente.</span>
+      </div>,
+      {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        onClose: () => setIsAuthenticated(false), // Cierra sesión después de la notificación
+      }
+    );
+  };
+
   return (
     <div className="App bg-white h-screen flex flex-col overflow-hidden">
-      <ToastContainer />
+      <ToastContainer
+  position="top-right" // O la posición que prefieras
+  autoClose={3000}
+  hideProgressBar={false}
+  newestOnTop={false}
+  closeOnClick
+  rtl={false}
+  pauseOnFocusLoss
+  draggable
+  pauseOnHover
+  style={{ marginTop: '45px' }} // Incrementa el margen superior para moverla hacia abajo
+/>
+
       <Header /> {/* Incluye el header con controles */}
       {!isAuthenticated ? (
         <Login onLogin={handleLogin} />
       ) : (
-        <>
-          <div className="flex flex-1">
-            <Sidebar
-              isOpen={isSidebarOpen}
-              toggleSidebar={toggleSidebar}
-              setView={setView}
-              setSelectedDate={handleDateSelect}
-              workWeekRange={workWeekRange}
-              fullWeekRange={fullWeekRange}
-              currentView={view}
-            />
+        <div className="flex flex-1">
+          <Sidebar
+            isOpen={isSidebarOpen}
+            toggleSidebar={toggleSidebar}
+            onLogout={handleLogout} // Agrega el botón de cerrar sesión en el Sidebar
+            setSelectedDate={handleDateSelect} // Actualización dinámica de semanas
+            workWeekRange={workWeekRange}
+            fullWeekRange={fullWeekRange}
+            currentView={view}
+            setView={setView} // Permite cambiar la vista en el Sidebar
+          />
 
-            <main
-              className={`flex-1 p-4 transition-all duration-300 ${
-                isSidebarOpen ? 'ml-64' : ''
-              } ${selectedDate ? 'mr-64' : ''}`}
-            >
-              {/* Barra de navegación para cambiar la vista */}
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex space-x-4">
-                  <button
-                    onClick={() => setView('day')}
-                    className={`${view === 'day' ? 'font-semibold' : ''}`}
-                  >
-                    Día
-                  </button>
-                  <button
-                    onClick={() => {
-                      setView('workWeek');
-                      updateWorkWeekRange(date);
-                    }}
-                    className={`${view === 'workWeek' ? 'font-semibold' : ''}`}
-                  >
-                    Semana laboral
-                  </button>
-                  <button
-                    onClick={() => {
-                      setView('week');
-                      updateFullWeekRange(date);
-                    }}
-                    className={`${view === 'week' ? 'font-semibold' : ''}`}
-                  >
-                    Semana
-                  </button>
-                  <button
-                    onClick={() => setView('month')}
-                    className={`${view === 'month' ? 'font-semibold' : ''}`}
-                  >
-                    Mes
-                  </button>
-                </div>
+          <main
+            className={`flex-1 p-4 transition-all duration-300 ${
+              isSidebarOpen ? 'ml-64' : ''
+            } ${selectedDate ? 'mr-64' : ''}`}
+          >
+            {/* Barra de navegación para cambiar la vista */}
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex space-x-6">
+                <button
+                  onClick={() => setView('day')}
+                  className={`text-lg ${
+                    view === 'day' ? 'font-bold text-black' : 'font-normal text-gray-700'
+                  }`}
+                >
+                  Día
+                </button>
+                <button
+                  onClick={() => {
+                    setView('workWeek');
+                    updateWorkWeekRange(date);
+                  }}
+                  className={`text-lg ${
+                    view === 'workWeek' ? 'font-bold text-black' : 'font-normal text-gray-700'
+                  }`}
+                >
+                  Semana laboral
+                </button>
+                <button
+                  onClick={() => {
+                    setView('week');
+                    updateFullWeekRange(date);
+                  }}
+                  className={`text-lg ${
+                    view === 'week' ? 'font-bold text-black' : 'font-normal text-gray-700'
+                  }`}
+                >
+                  Semana
+                </button>
+                <button
+                  onClick={() => setView('month')}
+                  className={`text-lg ${
+                    view === 'month' ? 'font-bold text-black' : 'font-normal text-gray-700'
+                  }`}
+                >
+                  Mes
+                </button>
               </div>
+            </div>
 
-              {/* Renderizado de vistas */}
-              {view === 'day' && <DayView date={date} setDate={setDate} />}
-              {view === 'workWeek' && (
-                <WorkWeekView
-                  date={date}
-                  setDate={(selectedDate) => {
-                    setDate(selectedDate);
-                    updateWorkWeekRange(selectedDate);
-                  }}
-                />
-              )}
-              {view === 'week' && (
-                <WeekView
-                  date={date}
-                  setDate={(selectedDate) => {
-                    setDate(selectedDate);
-                    updateFullWeekRange(selectedDate);
-                  }}
-                />
-              )}
-              {view === 'month' && (
-                <MonthView date={date} setDate={handleDateSelect} />
-              )}
-            </main>
-          </div>
+            {/* Renderizado de vistas */}
+            {view === 'day' && <DayView date={date} setDate={setDate} />}
+            {view === 'workWeek' && (
+              <WorkWeekView
+                date={date}
+                setDate={(selectedDate) => {
+                  setDate(selectedDate);
+                  updateWorkWeekRange(selectedDate);
+                }}
+              />
+            )}
+            {view === 'week' && (
+              <WeekView
+                date={date}
+                setDate={(selectedDate) => {
+                  setDate(selectedDate);
+                  updateFullWeekRange(selectedDate);
+                }}
+              />
+            )}
+            {view === 'month' && (
+              <MonthView date={date} setDate={handleDateSelect} />
+            )}
+          </main>
 
           {/* Barra lateral de detalles del día */}
           {selectedDate && (
             <DayDetailsSidebar selectedDate={selectedDate} onClose={closeDayDetails} />
           )}
-        </>
+        </div>
       )}
     </div>
   );

@@ -1,24 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CalendarSidebar from './calendarSidebar';
 
 function Sidebar({
   isOpen,
   toggleSidebar,
-  setView,
+  onLogout,
   setSelectedDate,
+  setView,
   workWeekRange,
   fullWeekRange,
   currentView,
 }) {
-  const handleDateSelection = (selectedDate) => {
-    setSelectedDate(selectedDate);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-    // Cambiar automáticamente a la vista correspondiente
-    if (currentView === 'workWeek') {
-      setView('workWeek');
-    } else if (currentView === 'week') {
-      setView('week');
-    }
+  const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
+    setShowLogoutConfirm(false);
+    onLogout(); // Delegamos la lógica de la notificación al App.jsx
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutConfirm(false);
   };
 
   return (
@@ -37,35 +42,45 @@ function Sidebar({
           <span className="material-icons text-blue-600">close</span>
         </button>
         <div className="p-4">
-          <h2 className="font-semibold text-lg">Navegación</h2>
-          <ul className="mt-4">
-            <li className="py-2 hover:bg-gray-200 cursor-pointer" onClick={() => setView('day')}>
-              Día
-            </li>
-            <li
-              className="py-2 hover:bg-gray-200 cursor-pointer"
-              onClick={() => setView('workWeek')}
-            >
-              Semana laboral
-            </li>
-            <li
-              className="py-2 hover:bg-gray-200 cursor-pointer"
-              onClick={() => setView('week')}
-            >
-              Semana
-            </li>
-            <li className="py-2 hover:bg-gray-200 cursor-pointer" onClick={() => setView('month')}>
-              Mes
-            </li>
-          </ul>
+          <h2 className="font-semibold text-lg">Calendario</h2>
           <CalendarSidebar
-            setSelectedDate={handleDateSelection}
+            setSelectedDate={setSelectedDate}
             workWeekRange={currentView === 'workWeek' ? workWeekRange : null}
             fullWeekRange={currentView === 'week' ? fullWeekRange : null}
             view={currentView}
+            setView={setView} // Pasar la función para actualizar la vista
           />
+          <div className="mt-6">
+            <button
+              onClick={handleLogout}
+              className="w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition"
+            >
+              Cerrar Sesión
+            </button>
+          </div>
         </div>
       </div>
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-md shadow-md">
+            <p className="text-lg mb-4">¿Estás seguro de que deseas cerrar sesión?</p>
+            <div className="flex space-x-4">
+              <button
+                onClick={confirmLogout}
+                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition"
+              >
+                Sí
+              </button>
+              <button
+                onClick={cancelLogout}
+                className="bg-gray-300 px-4 py-2 rounded-md hover:bg-gray-400 transition"
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

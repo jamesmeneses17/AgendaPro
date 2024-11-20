@@ -6,12 +6,13 @@ import {
   startOfMonth,
   endOfMonth,
   eachDayOfInterval,
+  startOfWeek,
   getDay,
   isToday,
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-function CalendarSidebar({ setSelectedDate, workWeekRange, fullWeekRange, view }) {
+function CalendarSidebar({ setSelectedDate, workWeekRange, fullWeekRange, view, setView }) {
   const [currentMonth, setCurrentMonth] = React.useState(new Date());
 
   const daysInMonth = eachDayOfInterval({
@@ -29,6 +30,10 @@ function CalendarSidebar({ setSelectedDate, workWeekRange, fullWeekRange, view }
 
   const handleDayClick = (day) => {
     setSelectedDate(day);
+    // Cambiar automáticamente la vista si es necesario
+    if (view === 'workWeek' || view === 'week') {
+      setView(view); // Mantener la vista actual
+    }
   };
 
   const startDay = (getDay(startOfMonth(currentMonth)) + 6) % 7;
