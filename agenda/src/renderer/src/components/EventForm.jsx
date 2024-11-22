@@ -1,18 +1,36 @@
-// EventForm.jsx
-import React from 'react';
+// src/components/EventForm.jsx
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+ import { saveEventToFirestore } from "../firebase/firestoreService";
 
-function EventForm({ selectedTime, onClose, onSubmit }) {
-  const handleFormSubmit = (e) => {
+
+
+function EventForm({ onClose }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     const formData = new FormData(e.target);
     const event = {
-      title: formData.get('title'),
-      startTime: formData.get('startTime'),
-      endTime: formData.get('endTime'),
-      reminder: formData.get('reminder'), // Incluye la opción de "Recordar"
-      description: formData.get('description'),
+      title: formData.get("title"),
+      startTime: formData.get("startTime"),
+      endTime: formData.get("endTime"),
+      reminder: formData.get("reminder"),
+      description: formData.get("description"),
+      date: new Date().toISOString(), // Agregar la fecha de creación
     };
-    onSubmit(event);
+
+    try {
+      await saveEventToFirestore(event); // Guardar en Firestore
+      toast.success("Evento guardado correctamente.");
+      onClose(); // Cerrar el formulario
+    } catch (error) {
+      toast.error("Error al guardar el evento.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,11 +52,6 @@ function EventForm({ selectedTime, onClose, onSubmit }) {
             <input
               name="startTime"
               type="time"
-              defaultValue={
-                selectedTime
-                  ? `${String(selectedTime.hour).padStart(2, '0')}:${String(selectedTime.minute).padStart(2, '0')}`
-                  : ''
-              }
               required
               className="border border-gray-300 rounded px-3 py-2 w-full"
             />
@@ -84,14 +97,16 @@ function EventForm({ selectedTime, onClose, onSubmit }) {
               type="button"
               onClick={onClose}
               className="px-4 py-2 bg-gray-200 rounded"
+              disabled={loading}
             >
               Cancelar
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-blue-500 text-white rounded"
+              disabled={loading}
             >
-              Guardar
+              {loading ? "Guardando..." : "Guardar"}
             </button>
           </div>
         </form>
