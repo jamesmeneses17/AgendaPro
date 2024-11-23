@@ -1,8 +1,7 @@
-// src/services/firestoreService.js
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { doc, updateDoc, collection, addDoc, getDocs } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 
-// Función para guardar un evento en Firestore
+// Función para guardar un evento en Firestore (crear)
 export const saveEventToFirestore = async (eventData) => {
   try {
     const docRef = await addDoc(collection(db, "events"), eventData);
@@ -10,6 +9,18 @@ export const saveEventToFirestore = async (eventData) => {
     return docRef.id; // Retorna el ID del documento creado
   } catch (error) {
     console.error("Error al guardar el evento:", error);
+    throw error;
+  }
+};
+
+// Función para actualizar un evento existente en Firestore
+export const updateEventInFirestore = async (eventId, eventData) => {
+  try {
+    const eventRef = doc(db, "events", eventId); // Referencia al documento
+    await updateDoc(eventRef, eventData); // Actualiza el documento
+    console.log("Evento actualizado:", eventId);
+  } catch (error) {
+    console.error("Error al actualizar el evento:", error);
     throw error;
   }
 };
