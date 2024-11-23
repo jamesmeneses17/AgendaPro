@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from './components/sidebar';
 import DayDetailsSidebar from './components/DayDetailsSidebar';
 import DayView from './components/dayView';
@@ -9,6 +9,7 @@ import Login from './components/Login';
 import Header from './components/header'; // Header con minimizar, maximizar y cerrar
 import { startOfWeek, addDays } from 'date-fns';
 import { ToastContainer, toast } from 'react-toastify';
+import { fetchEventsFromFirestore } from './firebase/firestoreService'; // Importa la función para cargar eventos
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
@@ -19,6 +20,24 @@ function App() {
   const [fullWeekRange, setFullWeekRange] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [events, setEvents] = useState([]); // Almacena los eventos
+
+  // Cargar eventos al montar el componente
+  useEffect(() => {
+    loadEvents();
+  }, []);
+
+  // Función para cargar eventos desde Firestore
+  const loadEvents = async () => {
+    try {
+      const fetchedEvents = await fetchEventsFromFirestore();
+      setEvents(fetchedEvents);
+      console.log('Eventos cargados:', fetchedEvents);
+    } catch (error) {
+      console.error('Error al cargar eventos:', error);
+      toast.error('Error al cargar eventos.');
+    }
+  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -97,17 +116,17 @@ function App() {
   return (
     <div className="App bg-white h-screen flex flex-col overflow-hidden">
       <ToastContainer
-  position="top-right" // O la posición que prefieras
-  autoClose={3000}
-  hideProgressBar={false}
-  newestOnTop={false}
-  closeOnClick
-  rtl={false}
-  pauseOnFocusLoss
-  draggable
-  pauseOnHover
-  style={{ marginTop: '45px' }} // Incrementa el margen superior para moverla hacia abajo
-/>
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        style={{ marginTop: '45px' }} // Incrementa el margen superior para moverla hacia abajo
+      />
 
       <Header /> {/* Incluye el header con controles */}
       {!isAuthenticated ? (
@@ -117,12 +136,12 @@ function App() {
           <Sidebar
             isOpen={isSidebarOpen}
             toggleSidebar={toggleSidebar}
-            onLogout={handleLogout} // Agrega el botón de cerrar sesión en el Sidebar
-            setSelectedDate={handleDateSelect} // Actualización dinámica de semanas
+            onLogout={handleLogout}
+            setSelectedDate={handleDateSelect}
             workWeekRange={workWeekRange}
             fullWeekRange={fullWeekRange}
             currentView={view}
-            setView={setView} // Permite cambiar la vista en el Sidebar
+            setView={setView}
           />
 
           <main
@@ -201,7 +220,14 @@ function App() {
 
           {/* Barra lateral de detalles del día */}
           {selectedDate && (
-            <DayDetailsSidebar selectedDate={selectedDate} onClose={closeDayDetails} />
+            <DayDetailsSidebar
+              selectedDate={selectedDate}
+              events={events.filter(
+                (event) => event.date === selectedDate.toISOString().split('T')[0]
+              )}
+              onClose={closeDayDetails}
+              onRefreshEvents={loadEvents} // Botón para actualizar eventos
+            />
           )}
         </div>
       )}

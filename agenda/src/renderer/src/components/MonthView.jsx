@@ -16,6 +16,7 @@ function MonthView({ date, setDate }) {
   const [currentMonth, setCurrentMonth] = useState(date || new Date());
   const [showForm, setShowForm] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
+  const [timer, setTimer] = useState(null);
 
   useEffect(() => {
     if (date) {
@@ -38,9 +39,19 @@ function MonthView({ date, setDate }) {
     setCurrentMonth(addMonths(currentMonth, 1));
   };
 
-  const handleDayClick = (selectedDay) => {
-    setSelectedDay(selectedDay); // Marca el día seleccionado
-    setDate(selectedDay); // Actualiza la fecha seleccionada
+  const handleDayClick = (day) => {
+    if (timer) {
+      clearTimeout(timer); // Cancela el temporizador para el clic simple
+      setTimer(null);
+      setShowForm(true); // Abre el formulario para el día seleccionado
+    } else {
+      const newTimer = setTimeout(() => {
+        setSelectedDay(day); // Muestra los detalles del día seleccionado
+        setDate(day);
+        setTimer(null);
+      }, 250); // Tiempo para diferenciar entre clic simple y doble clic
+      setTimer(newTimer);
+    }
   };
 
   const handleAddEvent = (event) => {
@@ -90,8 +101,7 @@ function MonthView({ date, setDate }) {
           {daysInMonth.map((day) => (
             <div
               key={day}
-              onClick={() => handleDayClick(day)}
-              onDoubleClick={() => setShowForm(true)}
+              onClick={() => handleDayClick(day)} // Diferencia entre clic y doble clic
               className={`h-20 p-2 border rounded flex flex-col justify-between cursor-pointer ${
                 isToday(day) ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'
               }`}
@@ -108,13 +118,10 @@ function MonthView({ date, setDate }) {
         </div>
       </div>
 
-      {/* Barra lateral condicional */}
-  
-
       {/* Formulario de evento */}
       {showForm && (
         <EventForm
-          selectedTime={selectedDay} // Pasa el día seleccionado al formulario
+          selectedDate={selectedDay} // Pasa el día seleccionado al formulario
           onClose={handleCloseForm}
           onSubmit={handleAddEvent}
         />

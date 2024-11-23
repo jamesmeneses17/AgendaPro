@@ -1,11 +1,8 @@
-// src/components/EventForm.jsx
 import React, { useState } from "react";
 import { toast } from "react-toastify";
- import { saveEventToFirestore } from "../firebase/firestoreService";
+import { saveEventToFirestore } from "../firebase/firestoreService";
 
-
-
-function EventForm({ onClose }) {
+function EventForm({ onClose, selectedDate }) {
   const [loading, setLoading] = useState(false);
 
   const handleFormSubmit = async (e) => {
@@ -19,7 +16,7 @@ function EventForm({ onClose }) {
       endTime: formData.get("endTime"),
       reminder: formData.get("reminder"),
       description: formData.get("description"),
-      date: new Date().toISOString(), // Agregar la fecha de creación
+      date: formData.get("date"), // Usar la fecha seleccionada o editada por el usuario
     };
 
     try {
@@ -38,6 +35,7 @@ function EventForm({ onClose }) {
       <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
         <h2 className="text-lg font-bold mb-4">Agregar un evento</h2>
         <form onSubmit={handleFormSubmit}>
+          {/* Campo para Título */}
           <div className="mb-4">
             <label className="block text-sm font-medium">Título</label>
             <input
@@ -47,6 +45,20 @@ function EventForm({ onClose }) {
               className="border border-gray-300 rounded px-3 py-2 w-full"
             />
           </div>
+
+          {/* Campo para Fecha */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium">Fecha</label>
+            <input
+              name="date"
+              type="date"
+              required
+              defaultValue={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+            />
+          </div>
+
+          {/* Campo para Hora de inicio */}
           <div className="mb-4">
             <label className="block text-sm font-medium">Hora de inicio</label>
             <input
@@ -56,6 +68,8 @@ function EventForm({ onClose }) {
               className="border border-gray-300 rounded px-3 py-2 w-full"
             />
           </div>
+
+          {/* Campo para Hora de fin */}
           <div className="mb-4">
             <label className="block text-sm font-medium">Hora de fin</label>
             <input
@@ -65,6 +79,8 @@ function EventForm({ onClose }) {
               className="border border-gray-300 rounded px-3 py-2 w-full"
             />
           </div>
+
+          {/* Campo para Recordatorio */}
           <div className="mb-4">
             <label className="block text-sm font-medium">Recordatorio</label>
             <select
@@ -84,6 +100,8 @@ function EventForm({ onClose }) {
               <option value="1Week">1 semana antes</option>
             </select>
           </div>
+
+          {/* Campo para Descripción */}
           <div className="mb-4">
             <label className="block text-sm font-medium">Descripción</label>
             <textarea
@@ -92,6 +110,8 @@ function EventForm({ onClose }) {
               className="border border-gray-300 rounded px-3 py-2 w-full"
             ></textarea>
           </div>
+
+          {/* Botones para Guardar o Cancelar */}
           <div className="flex justify-end space-x-4">
             <button
               type="button"
@@ -116,3 +136,5 @@ function EventForm({ onClose }) {
 }
 
 export default EventForm;
+
+

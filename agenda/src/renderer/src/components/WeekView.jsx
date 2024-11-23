@@ -5,6 +5,7 @@ import EventForm from './EventForm';
 
 function WeekView({ date, setDate }) {
   const [showForm, setShowForm] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [events, setEvents] = useState([]);
 
@@ -14,27 +15,27 @@ function WeekView({ date, setDate }) {
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
   const handleRowClick = (day, hour) => {
-    const time = {
-      day,
-      hour,
-      minute: 0,
-    };
-    setSelectedTime(time);
-    setShowForm(true);
+    setSelectedDate(day); // Guarda el día seleccionado
+    setSelectedTime(`${hour}:00`); // Guarda la hora seleccionada
+    setShowForm(true); // Abre el formulario
   };
 
   const handleAddEvent = (event) => {
-    setEvents([...events, event]);
+    setEvents([...events, event]); // Agrega el evento a la lista
     setShowForm(false); // Oculta el formulario después de guardar
+    setSelectedDate(null);
+    setSelectedTime(null); // Limpia las selecciones
   };
 
   const handleCloseForm = () => {
     setShowForm(false); // Oculta el formulario al cancelar
-    setSelectedTime(null); // Limpia la hora seleccionada
+    setSelectedDate(null);
+    setSelectedTime(null); // Limpia las selecciones
   };
 
   return (
     <div className="p-4">
+      {/* Barra de navegación de la semana completa */}
       <div className="flex justify-between items-center mb-4">
         <button
           onClick={() => setDate(addDays(date, -7))}
@@ -54,8 +55,9 @@ function WeekView({ date, setDate }) {
         </button>
       </div>
 
+      {/* Grid de la semana completa */}
       <div className="grid grid-cols-8 border border-gray-300 h-[calc(100vh-200px)] overflow-y-auto">
-        {/* Columna "Horas" */}
+        {/* Columna de "Horas" */}
         <div className="bg-gray-100 text-center sticky top-0 z-10">
           <div className="py-6 border-b text-sm text-black">Horas</div>
           {hours.map((hour) => (
@@ -80,7 +82,7 @@ function WeekView({ date, setDate }) {
               <div
                 key={`${dayIndex}-${hour}`}
                 className="h-12 border-b border-l flex items-center cursor-pointer hover:bg-blue-100"
-                onClick={() => handleRowClick(day, hour)}
+                onClick={() => handleRowClick(day, hour)} // Maneja el clic en una celda
               >
                 <div className="flex-1"></div>
               </div>
@@ -89,11 +91,13 @@ function WeekView({ date, setDate }) {
         ))}
       </div>
 
+      {/* Formulario de evento */}
       {showForm && (
         <EventForm
-          selectedTime={selectedTime}
-          onClose={handleCloseForm}
-          onSubmit={handleAddEvent}
+          selectedDate={selectedDate} // Pasa la fecha seleccionada al formulario
+          selectedTime={selectedTime} // Pasa la hora seleccionada al formulario
+          onClose={handleCloseForm} // Maneja el cierre del formulario
+          onSubmit={handleAddEvent} // Maneja la adición de eventos
         />
       )}
     </div>
