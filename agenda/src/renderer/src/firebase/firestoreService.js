@@ -1,5 +1,9 @@
-import { doc, updateDoc, collection, addDoc, getDocs } from "firebase/firestore";
+import { doc, updateDoc, collection, addDoc, getDocs,deleteDoc } from "firebase/firestore";
 import { db } from "./firebaseConfig";
+
+
+
+
 
 // Función para guardar un evento en Firestore (crear)
 export const saveEventToFirestore = async (eventData) => {
@@ -36,6 +40,17 @@ export const fetchEventsFromFirestore = async () => {
     return events; // Retorna un arreglo con los eventos
   } catch (error) {
     console.error("Error al obtener eventos:", error);
+    throw error;
+  }
+};
+// Función para eliminar un evento en Firestore
+export const deleteEventFromFirestore = async (eventId) => {
+  try {
+    const eventRef = doc(db, "events", eventId); // Referencia al documento
+    await deleteDoc(eventRef); // Eliminar el documento
+    console.log("Evento eliminado:", eventId);
+  } catch (error) {
+    console.error("Error al eliminar el evento:", error);
     throw error;
   }
 };

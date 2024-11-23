@@ -7,6 +7,7 @@ function DayDetailsSidebar({
   events,
   onClose,
   onRefreshEvents,
+  onDeleteEvent, // Recibe la función para eliminar eventos
 }) {
   const [selectedEvent, setSelectedEvent] = useState(null); // Estado para el evento seleccionado
 
@@ -20,6 +21,10 @@ function DayDetailsSidebar({
   // Manejar clic en un evento
   const handleEventClick = (event) => {
     setSelectedEvent(event); // Cargar la información del evento seleccionado
+  };
+
+  const handleDelete = (eventId) => {
+    onDeleteEvent(eventId); // Llamar a la función para eliminar el evento
   };
 
   const handleCloseForm = () => {
@@ -63,13 +68,20 @@ function DayDetailsSidebar({
             {filteredEvents.map((event) => (
               <div
                 key={event.id}
-                className="p-2 border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:bg-gray-100"
-                onClick={() => handleEventClick(event)} // Abre el formulario al hacer clic
+                className="p-2 border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:bg-gray-100 flex justify-between items-center"
               >
-                <h3 className="font-bold">{event.title}</h3>
-                <p className="text-sm text-gray-500">
-                  {event.startTime} - {event.endTime}
-                </p>
+                <div onClick={() => handleEventClick(event)}>
+                  <h3 className="font-bold">{event.title}</h3>
+                  <p className="text-sm text-gray-500">
+                    {event.startTime} - {event.endTime}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleDelete(event.id)} // Llama a la función de eliminar
+                  className="bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600"
+                >
+                  Eliminar
+                </button>
               </div>
             ))}
           </div>

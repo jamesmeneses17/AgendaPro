@@ -11,6 +11,8 @@ import { startOfWeek, addDays } from 'date-fns';
 import { ToastContainer, toast } from 'react-toastify';
 import { fetchEventsFromFirestore } from './firebase/firestoreService'; // Importa la función para cargar eventos
 import 'react-toastify/dist/ReactToastify.css';
+import { deleteEventFromFirestore } from './firebase/firestoreService'; // Importar función de eliminación
+
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -113,6 +115,17 @@ function App() {
     );
   };
 
+  const handleDeleteEvent = async (eventId) => {
+    try {
+      await deleteEventFromFirestore(eventId); // Eliminar de Firestore
+      const updatedEvents = events.filter((event) => event.id !== eventId);
+      setEvents(updatedEvents); // Actualiza el estado con los eventos restantes
+      toast.success('Evento eliminado correctamente.');
+    } catch (error) {
+      console.error('Error al eliminar el evento:', error);
+      toast.error('Error al eliminar el evento.');
+    }
+  };
   return (
     <div className="App bg-white h-screen flex flex-col overflow-hidden">
       <ToastContainer
@@ -227,6 +240,8 @@ function App() {
               )}
               onClose={closeDayDetails}
               onRefreshEvents={loadEvents} // Botón para actualizar eventos
+              onDeleteEvent={handleDeleteEvent} // Pasa la función de eliminar
+
             />
           )}
         </div>

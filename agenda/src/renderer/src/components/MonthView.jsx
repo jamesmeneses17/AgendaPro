@@ -12,7 +12,7 @@ import {
 import { es } from 'date-fns/locale';
 import EventForm from './EventForm';
 
-function MonthView({ date, setDate }) {
+function MonthView({ date, setDate, events = [] }) {
   const [currentMonth, setCurrentMonth] = useState(date || new Date());
   const [showForm, setShowForm] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
@@ -71,26 +71,13 @@ function MonthView({ date, setDate }) {
           <button onClick={handlePreviousMonth} className="p-2">
             &#8592;
           </button>
-          <h2 className="text-xl font-bold">
-            {format(currentMonth, 'MMMM yyyy', { locale: es })}
-          </h2>
+          <h2 className="text-xl font-bold">{format(currentMonth, 'MMMM yyyy', { locale: es })}</h2>
           <button onClick={handleNextMonth} className="p-2">
             &#8594;
           </button>
         </div>
 
         {/* Cabecera del calendario */}
-        <div className="grid grid-cols-7 text-center font-semibold mb-2">
-          {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map(
-            (day) => (
-              <div key={day} className="text-gray-600">
-                {day}
-              </div>
-            )
-          )}
-        </div>
-
-        {/* Días del mes */}
         <div className="grid grid-cols-7 gap-1">
           {/* Espacios en blanco para los días antes del inicio del mes */}
           {Array.from({ length: startDay }).map((_, index) => (
@@ -98,23 +85,38 @@ function MonthView({ date, setDate }) {
           ))}
 
           {/* Días del mes */}
-          {daysInMonth.map((day) => (
-            <div
-              key={day}
-              onClick={() => handleDayClick(day)} // Diferencia entre clic y doble clic
-              className={`h-20 p-2 border rounded flex flex-col justify-between cursor-pointer ${
-                isToday(day) ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'
-              }`}
-            >
-              <div className="text-sm font-bold">
-                {format(day, 'd', { locale: es })}
+          {daysInMonth.map((day) => {
+            // Filtrar eventos que coinciden con el día actual
+            const dayEvents = events.filter(
+              (event) => format(new Date(event.date), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')
+            );
+
+            const hasEvents = dayEvents.length > 0; // Determina si el día tiene eventos
+
+            return (
+              <div
+                key={day}
+                onClick={() => handleDayClick(day)}
+                className={`h-20 p-1 border rounded flex flex-col justify-between cursor-pointer hover:bg-gray-200 relative ${
+                  hasEvents ? 'bg-red-100' : '' // Fondo de color si tiene eventos
+                }`}
+              >
+                {/* Número del día */}
+                <div
+                  className={`text-sm font-bold flex items-center justify-center ${
+                    isToday(day) ? 'bg-blue-500 text-white rounded-full w-8 h-8 mx-auto' : ''
+                  }`}
+                >
+                  {format(day, 'd', { locale: es })}
+                </div>
+
+                {/* Indicador de eventos */}
+                {hasEvents && (
+                  <div className="w-4 h-4 bg-red-500 rounded-full absolute top-1 right-1"></div>
+                )}
               </div>
-              {/* Placeholder para eventos o información adicional */}
-              <div className="text-xs text-gray-500">
-                {isToday(day) ? 'Hoy' : ''}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
