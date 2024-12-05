@@ -2,9 +2,6 @@ import { doc, updateDoc, collection, addDoc, getDocs,deleteDoc } from "firebase/
 import { db } from "./firebaseConfig";
 
 
-
-
-
 // Función para guardar un evento en Firestore (crear)
 export const saveEventToFirestore = async (eventData) => {
   try {

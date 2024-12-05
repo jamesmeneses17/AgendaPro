@@ -15,14 +15,16 @@ function createWindow() {
     width: width,
     height: height,
     show: false,
-    frame: false, // Usamos un encabezado personalizado, así que frame es false
+    frame: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    icon: join(__dirname, '../../build/icon.ico'), // Ruta corregida para Windows
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }
   });
+  
+  
 
   mainWindow.setAlwaysOnTop(true, 'screen');
 

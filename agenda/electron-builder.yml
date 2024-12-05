@@ -12,6 +12,8 @@ asarUnpack:
   - resources/**
 win:
   executableName: agenda
+    icon: build/icon.ico # Ruta al ícono para Windows
+  
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
