@@ -199,14 +199,7 @@ function App() {
             {/* Barra de navegación para cambiar la vista */}
             <div className="flex justify-between items-center mb-4">
               <div className="flex space-x-6">
-                <button
-                  onClick={() => setView('day')}
-                  className={`text-lg ${
-                    view === 'day' ? 'font-bold text-black' : 'font-normal text-gray-700'
-                  }`}
-                >
-                  Día
-                </button>
+                
                 <button
                   onClick={() => {
                     setView('workWeek')
@@ -241,35 +234,34 @@ function App() {
             </div>
 
             {/* Renderizado de vistas */}
-            {view === 'day' && <DayView date={date} setDate={setDate} />}
+         
+
+
             {view === 'workWeek' && (
               <WorkWeekView
-                date={date}
-                setDate={(selectedDate) => {
-                  setDate(selectedDate)
-                  updateWorkWeekRange(selectedDate)
-                }}
+                             date={date}
+                setDate={setDate}
+                events={events}
+                onShowDayDetails={setSelectedDate} // Conecta `setSelectedDate` aquí
               />
             )}
-          {view === "week" && (
-  <WeekView
-    date={date}
-    setDate={setDate}
-  
-    events={events}
-    onShowDayDetails={setSelectedDate} // Conecta `setSelectedDate` aquí
-  />
-)}
+            {view === 'week' && (
+              <WeekView
+                date={date}
+                setDate={setDate}
+                events={events}
+                onShowDayDetails={setSelectedDate} // Conecta `setSelectedDate` aquí
+              />
+            )}
 
-            {view === 'month' &&
-          <MonthView
-          date={date}
-          setDate={setDate}
-          events={events}
-          onShowDayDetails={setSelectedDate} // Aquí se pasa la función que muestra el DayDetailsSidebar
-          />
-         
-             }
+            {view === 'month' && (
+              <MonthView
+                date={date}
+                setDate={setDate}
+                events={events}
+                onShowDayDetails={setSelectedDate} // Aquí se pasa la función que muestra el DayDetailsSidebar
+              />
+            )}
           </main>
 
           {/* Barra lateral de detalles del día */}

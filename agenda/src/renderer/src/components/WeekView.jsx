@@ -4,7 +4,14 @@ import { es } from "date-fns/locale";
 import EventForm from "./EventForm";
 import DayDetailsSidebar from "./DayDetailsSidebar";
 
-function WeekView({ date, setDate, events, onShowDayDetails, onRefreshEvents, onDeleteEvent }) {
+function WeekView({
+  date,
+  setDate,
+  events,
+  onShowDayDetails,
+  onRefreshEvents,
+  onDeleteEvent,
+}) {
   const [showForm, setShowForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [timer, setTimer] = useState(null);
@@ -25,6 +32,7 @@ function WeekView({ date, setDate, events, onShowDayDetails, onRefreshEvents, on
         if (onShowDayDetails) {
           onShowDayDetails(day); // Llama a la función para mostrar los detalles del día
         }
+        setSelectedDate(day); // Abre la barra lateral
       }, 250); // Espera 250ms para diferenciar un clic de un doble clic
       setTimer(newTimer);
     }
@@ -98,25 +106,24 @@ function WeekView({ date, setDate, events, onShowDayDetails, onRefreshEvents, on
                   {format(day, "dd")}
                 </div>
                 {/* Celdas por hora */}
-                {hours.map((hour) => (
-                  <div
-                    key={`${dayIndex}-${hour}`}
-                    className={`h-12 border-b border-l flex items-center cursor-pointer hover:bg-blue-100`}
-                    onClick={() => handleCellClick(day)}
-                  >
-                    <div className="flex-1">
-                      {/* Renderizar evento si existe */}
-                      {dayEvents.map((event) => (
-                        <div
-                          key={event.id}
-                          className="text-xs bg-blue-200 p-1 rounded-md m-1"
-                        >
-                          {event.title}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                {hours.map((hour) => {
+  const hasEventAtHour = dayEvents.some(
+    (event) => parseInt(event.startTime.split(":")[0]) === hour
+  );
+
+  return (
+    <div
+      key={`${dayIndex}-${hour}`}
+      className={`h-12 border-b border-l flex items-center cursor-pointer ${
+        hasEventAtHour ? "bg-green-200" : "hover:bg-blue-100"
+      }`}
+      onClick={() => handleCellClick(day)}
+    >
+      <div className="flex-1"></div>
+    </div>
+  );
+})}
+
               </div>
             );
           })}

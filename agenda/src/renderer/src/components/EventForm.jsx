@@ -13,7 +13,7 @@ function EventForm({ selectedEvent, selectedDate, onClose }) {
     description: "",
   });
 
-  // Rellena el formulario al abrirlo, según `selectedEvent` o `selectedDate`
+  // Rellena el formulario al abrirlo, shandleegún `selectedEvent` o `selectedDate`
   useEffect(() => {
     if (selectedEvent) {
       // Si estamos editando un evento existente, carga sus datos
@@ -27,9 +27,13 @@ function EventForm({ selectedEvent, selectedDate, onClose }) {
       });
     } else if (selectedDate) {
       // Si es un nuevo evento, establece la fecha seleccionada
+      const defaultStartTime = selectedDate.toTimeString().slice(0, 5); // Extrae la hora "HH:mm"
+
+
       setFormData((prev) => ({
         ...prev,
         date: selectedDate.toISOString().split("T")[0], // Formato ISO (yyyy-mm-dd)
+        startTime: defaultStartTime, // Configura la hora inicial
       }));
     }
   }, [selectedEvent, selectedDate]);
