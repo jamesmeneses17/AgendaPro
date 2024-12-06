@@ -51,3 +51,12 @@ export const deleteEventFromFirestore = async (eventId) => {
     throw error;
   }
 };
+export const markEventAsNotified = async (eventId) => {
+  try {
+    const eventRef = doc(db, "events", eventId);
+    await updateDoc(eventRef, { notified: true });
+    console.log(`Evento ${eventId} marcado como notificado`);
+  } catch (error) {
+    console.error("Error al marcar el evento como notificado:", error);
+  }
+};

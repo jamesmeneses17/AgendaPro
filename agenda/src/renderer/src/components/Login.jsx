@@ -30,7 +30,7 @@ function Login({ onLogin }) {
         await signInWithEmailAndPassword(auth, email, password);
         onLogin(true, 'Inicio de sesión exitoso.'); // Notificación de éxito
       } catch (error) {
-        onLogin(false, 'Error al iniciar sesión. .'); // Notificación de error
+        onLogin(false, 'Error al iniciar sesión.'); // Notificación de error
       }
     }
   };
@@ -39,12 +39,18 @@ function Login({ onLogin }) {
     <div className="h-screen bg-gray-200 flex flex-col">
       <div className="flex flex-1 items-center justify-center mt-10">
         <div className="relative bg-white rounded-lg shadow-lg flex overflow-hidden w-3/4 max-w-4xl">
+          {/* Sección izquierda */}
           <div className="w-1/2 bg-blue-500 text-white flex flex-col justify-center items-center p-8">
-            <h2 className="text-3xl font-bold mb-4">
+            <h2 className="text-3xl font-bold mb-2">
               {isRegistering
                 ? 'Únete a nuestro Calendario'
                 : 'Bienvenido al Calendario'}
             </h2>
+            <p className="text-center mb-4">
+              {isRegistering
+                ? 'Regístrate y organiza tus tareas fácilmente.'
+                : 'Inicia sesión para gestionar tus eventos diarios.'}
+            </p>
             <button
               onClick={handleSwitchMode}
               className="bg-white text-blue-500 px-4 py-2 rounded-md shadow hover:bg-gray-100 transition"
@@ -53,10 +59,16 @@ function Login({ onLogin }) {
             </button>
           </div>
 
+          {/* Sección derecha */}
           <div className="w-1/2 p-8">
-            <h2 className="text-2xl font-bold mb-6">
+            <h2 className="text-2xl font-bold mb-2">
               {isRegistering ? 'Regístrate aquí' : 'Inicia sesión aquí'}
             </h2>
+            <p className="text-sm text-gray-500 mb-6">
+              {isRegistering
+                ? 'Completa tus datos para crear una cuenta y empezar a organizarte.'
+                : 'Introduce tus credenciales para acceder a tu calendario.'}
+            </p>
             <form onSubmit={handleSubmit}>
               {isRegistering && (
                 <div className="mb-4">

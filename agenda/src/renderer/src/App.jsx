@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Sidebar from './components/sidebar'
 import DayDetailsSidebar from './components/DayDetailsSidebar'
-import DayView from './components/dayView'
 import WorkWeekView from './components/workWeekView'
 import WeekView from './components/WeekView'
 import MonthView from './components/MonthView'

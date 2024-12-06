@@ -111,7 +111,7 @@ function MonthView({ date, setDate, events , onShowDayDetails }) {
       key={day}
       onClick={() => handleDayClick(day)}
       className={`h-20 p-1 border rounded flex flex-col justify-between cursor-pointer hover:bg-gray-200 relative ${
-        hasEvents ? 'bg-red-100' : '' // Fondo de color si tiene eventos
+        hasEvents ? 'bg-green-200' : '' // Fondo de color si tiene eventos
       }`}
     >
       {/* Número del día */}

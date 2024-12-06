@@ -27,16 +27,19 @@ function EventForm({ selectedEvent, selectedDate, onClose }) {
       });
     } else if (selectedDate) {
       // Si es un nuevo evento, establece la fecha seleccionada
-      const defaultStartTime = selectedDate.toTimeString().slice(0, 5); // Extrae la hora "HH:mm"
-
-
+      const defaultStartTime = new Date().toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }); // Extrae la hora local "HH:mm"
+  
       setFormData((prev) => ({
         ...prev,
         date: selectedDate.toISOString().split("T")[0], // Formato ISO (yyyy-mm-dd)
-        startTime: defaultStartTime, // Configura la hora inicial
+        startTime: defaultStartTime, // Configura la hora inicial como la hora local
       }));
     }
   }, [selectedEvent, selectedDate]);
+  
 
   const handleChange = (e) => {
     setFormData({

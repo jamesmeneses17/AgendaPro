@@ -1,6 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const useNotifications = (events) => {
+  const [notifiedEvents, setNotifiedEvents] = useState([]);
+
   useEffect(() => {
     if (!("Notification" in window)) {
       alert("Tu navegador no soporta notificaciones.");
@@ -31,8 +33,13 @@ export const useNotifications = (events) => {
     const now = new Date();
     events.forEach((event) => {
       const eventTime = new Date(event.date + " " + event.startTime);
-      if (eventTime - now <= 5 * 60 * 1000) {
+
+      // Verifica si el evento ya fue notificado
+      if (eventTime - now <= 5 * 60 * 1000 && !notifiedEvents.includes(event.id)) {
         sendNotification(event);
+
+        // Agrega el evento a la lista de notificados
+        setNotifiedEvents((prev) => [...prev, event.id]);
       }
     });
   };
